@@ -1,0 +1,145 @@
+# vim:syntax=apparmor
+# Author: Bozhin Zafirov <bozhin@abv.bg>
+
+#include <tunables/global>
+
+/usr/share/teams/teams {
+  #include <abstractions/X>
+  #include <abstractions/base>
+  #include <abstractions/bash>
+  #include <abstractions/fonts>
+  #include <abstractions/audio>
+  #include <abstractions/kde>
+  #include <abstractions/dbus-strict>
+  #include <abstractions/dbus-session>
+  #include <abstractions/dconf>
+  #include <abstractions/freedesktop.org>
+  #include <abstractions/nameservice>
+
+        dbus (send)
+                bus=system
+                interface="org.freedesktop.DBus",
+        dbus (send)
+                path="/org/freedesktop/login1"
+                bus=system
+                interface="org.freedesktop.login1.Manager",
+        dbus (send)
+                bus=system
+                interface="org.freedesktop.DBus.Properties",
+
+
+  capability sys_admin,
+  capability sys_chroot,
+  capability sys_ptrace,
+  signal (send) set=(int,quit,term,kill) peer=unconfined,
+
+  # access to binary
+  /usr/share/teams/ rmPx,
+  /usr/share/skypeforlinux/* rm,
+
+  # binutils
+  /usr/bin/readlink Uxr,
+  /usr/bin/mkdir Uxr,
+  /usr/bin/dirname Uxr,
+  /usr/bin/nohup Uxr,
+  /usr/bin/bash Uxr,
+  /usr/bin/wget rix,
+  /bin/sh rix,
+
+  # audio
+  /etc/asound.conf r,
+
+  # run
+  /run/shm/pulse-shm-** m,
+  /run/user/*/dconf/user rwk,
+
+  /selinux/ r,
+
+
+  # home files
+#  @{HOME}/ r,
+#  @{HOME}/* rwk,
+   @{HOME}/.cache/** rwk,
+   @{HOME}/.pki/** rwk,
+   @{HOME}/CS_skylib/ rw,
+   "@{HOME}/.config/Microsoft/Microsoft Teams/**" rwk,
+   @{HOME}/.config/teams/ rwk,
+   @{HOME}/.config/teams/** rwk,
+   @{HOME}/.icons/default/index.theme r,
+
+  # group :@
+  /etc/group r,
+  /etc/wgetrc r,
+  /etc/nsswitch.conf r,
+  /etc/gtk-3.0/settings.ini r,
+
+  # Teams shared data
+  /usr/share/teams/ rmPx,
+  /usr/share/teams/** rmPx,
+  /usr/share/themes/*/*/* r,
+  /usr/share/glib-2.0/schemas/* r,
+
+  # shared libraries
+  /usr/lib/** rm,
+
+  # /proc
+  #@{PROC}/sys/kernel/ostype r,
+  #@{PROC}/sys/kernel/osrelease r,
+  @{PROC}/version r,
+  @{PROC}/sys/fs/inotify/max_user_watches rm,
+  @{PROC}/ r,
+  @{PROC}/*/net/arp r,
+  @{PROC}/*/cmdline r,
+  @{PROC}/*/setgroups rw,
+  @{PROC}/*/gid_map rw,
+  @{PROC}/*/uid_map rw,
+  @{PROC}/*/fd/ r,
+  @{PROC}/*/fd/* rw,
+  @{PROC}/*/fdinfo/ rw,
+  #@{PROC}/*/fdinfo/* rw,
+  @{PROC}/*/stat r,
+  @{PROC}/*/statm r,
+  @{PROC}/loadavg r,
+  @{PROC}/*/environ r,
+  @{PROC}/*/task/ r,
+  @{PROC}/*/task/*/stat r,
+  @{PROC}/*/task/*/status r,
+  @{PROC}/*/task/*/syscall r,
+  @{PROC}/*/net/route r,
+  @{PROC}/*/oom_score_adj rw,
+
+
+  # /sys
+  /sys/devices/system/cpu/ r,
+  /sys/devices/system/cpu/cpu*/ r,
+  /sys/devices/system/cpu/cpufreq/policy*/cpuinfo_max_freq r,
+  /sys/devices/system/cpu/cpu*/topology/core_id r,
+  /sys/devices/system/cpu/cpu*/topology/physical_package_id r,
+  /sys/devices/system/cpu/*/cpufreq/scaling_cur_freq r,
+  /sys/devices/system/cpu/*/cpufreq/scaling_max_freq r,
+  /sys/devices/pci*/*/*/* r,
+  /sys/devices/pci*/*/*/** r,
+  /sys/devices/pci*/*/* r,
+  /sys/devices/virtual/*/*/* r,
+  /sys/bus/pci/devices/ r,
+  /sys/bus/pci/devices/*/* r,
+
+
+  # /dev
+  /dev/ r,
+  /dev/snd/* rm,
+  /dev/video0 rw,
+  /dev/pts/* rw,
+  /dev/shm/* rw,
+  /dev/fd/* rw,
+  owner /dev/tty rw,
+
+  ptrace (trace) peer=Chrome_IOThread,
+  ptrace (trace) peer=/usr/share/teams/teams,
+
+  # deny rules
+  deny /etc/hosts r,
+  deny /etc/ssl/certs/ca-certificates.crt r,
+  deny /home/data krw,
+  deny /root krw,
+}
