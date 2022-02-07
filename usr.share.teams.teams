@@ -35,7 +35,6 @@
 
   # access to binary
   /usr/share/teams/ rmPx,
-  /usr/share/skypeforlinux/* rm,
 
   # binutils
   /usr/bin/readlink Uxr,
