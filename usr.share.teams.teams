@@ -136,9 +136,4 @@
   ptrace (trace) peer=Chrome_IOThread,
   ptrace (trace) peer=/usr/share/teams/teams,
 
-  # deny rules
-  deny /etc/hosts r,
-  deny /etc/ssl/certs/ca-certificates.crt r,
-  deny /home/data krw,
-  deny /root krw,
 }
